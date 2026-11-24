@@ -1,0 +1,16 @@
+# Shared settings. Every experiment config starts from these values and changes one thing.
+seed: 42
+data_dir: null            # null = use the CXR_DATA_DIR variable or the Kaggle input folder
+split_csv: data/split.csv
+val_size: 0.15
+test_size: 0.15
+
+# CNN input (Phase 3)
+img_size: 224
+batch_size: 32
+augment: true
+use_class_weights: true
+
+# baselines (Phase 2)
+baseline_img_size: 64     # 64 x 64 grayscale = 4096 pixel features
+logreg_C: 0.01
