@@ -12,6 +12,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from sklearn.model_selection import StratifiedGroupKFold
 
 CLASSES = ["NORMAL", "PNEUMONIA"]  # label 0 = NORMAL, label 1 = PNEUMONIA
@@ -127,9 +128,62 @@ def load_split(csv_path="data/split.csv"):
     return df
 
 
+def class_weights(labels):
+    """Weight n / (2 * n_c) per class, so both classes count the same in the loss (same as sklearn 'balanced')."""
+    counts = np.bincount(np.asarray(labels, dtype=int), minlength=2)
+    return {c: float(len(labels) / (2 * counts[c])) for c in range(2)}
 
 
+def load_image(path, img_size=224):
+    """Read one image file as grayscale, copy it to 3 channels, resize to img_size x img_size and scale to [0, 1].
 
+    All 283 RGB files in the dataset are PNEUMONIA, so if we kept their colour the model could
+    learn "colour = pneumonia". Reading as grayscale removes that. 3 channels because VGG16 needs them.
+    The same function is used for training, evaluation and predict.py, so the preprocessing
+    is never written twice. Pixel scaling is a fixed /255, nothing is fitted, so nothing can leak.
+    """
+    img = tf.io.read_file(path)
+    img = tf.io.decode_image(img, channels=1, expand_animations=False)
+    img = tf.image.grayscale_to_rgb(img)
+    img = tf.image.resize(img, [img_size, img_size])
+    return img / 255.0
+
+
+def augmentation_layers(seed=42):
+    """Small changes that could happen in a real X-ray: rotation, zoom, shift and contrast.
+
+    No horizontal flip on purpose: the heart is on the left, so a flipped X-ray is not a real X-ray.
+    """
+    return tf.keras.Sequential([
+        tf.keras.layers.RandomRotation(0.03, seed=seed),  # 0.03 of a full turn, about 10 degrees
+        tf.keras.layers.RandomZoom(0.1, seed=seed),
+        tf.keras.layers.RandomTranslation(0.05, 0.05, seed=seed),
+        tf.keras.layers.RandomContrast(0.1, value_range=(0, 1), seed=seed),
+    ], name="augmentation")
+
+
+def make_dataset(df, data_dir=None, img_size=224, batch_size=32, shuffle=False, augment=False, seed=42):
+    """Build a batched tf.data.Dataset of (image, label) from rows of the split table."""
+    if augment and set(df["split"]) != {"train"}:
+        raise ValueError("augmentation is only allowed on the training set")
+    root = find_data_dir(data_dir)
+    paths = [str(root / p) for p in df["path"]]
+    ds = tf.data.Dataset.from_tensor_slices((paths, df["label"].to_numpy(dtype="float32")))
+    if shuffle:
+        ds = ds.shuffle(len(paths), seed=seed, reshuffle_each_iteration=True)
+    ds = ds.map(lambda p, y: (load_image(p, img_size), y), num_parallel_calls=tf.data.AUTOTUNE)
+    ds = ds.batch(batch_size)
+    if augment:
+        aug = augmentation_layers(seed)
+        ds = ds.map(lambda x, y: (aug(x, training=True), y), num_parallel_calls=tf.data.AUTOTUNE)
+    return ds.prefetch(tf.data.AUTOTUNE)
+
+
+def load_arrays(df, data_dir=None, img_size=64):
+    """Load images as flat grayscale vectors for the sklearn baselines, using the same load_image as the CNNs."""
+    ds = make_dataset(df, data_dir, img_size, batch_size=256)
+    X = np.concatenate([x.numpy().mean(axis=-1).reshape(len(x), -1) for x, _ in ds])
+    return X, df["label"].to_numpy(dtype=int)
 
 
 def main():
