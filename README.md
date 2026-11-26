@@ -11,8 +11,8 @@ CNN: a custom CNN built from scratch, then VGG16 or ResNet-50 transfer learning 
 Kaggle lists "Other (specified in description)". The original Mendeley Data dataset [1] is released under CC BY 4.0, which permits academic use with attribution. This is an educational prototype, not a clinical diagnostic tool.
 
 ## References
-[1] D. Kermany, K. Zhang, and M. Goldbaum, "Large Dataset of Labeled Optical Coherence Tomography (OCT) and Chest X-Ray Images," Mendeley Data, V3, 2018. https://data.mendeley.com/datasets/rscbjbr9sj/3
+\[1\] D. Kermany, K. Zhang, and M. Goldbaum, "Large Dataset of Labeled Optical Coherence Tomography (OCT) and Chest X-Ray Images," Mendeley Data, V3, 2018. https://data.mendeley.com/datasets/rscbjbr9sj/3
 
-[2] D. S. Kermany et al., "Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning," Cell, vol. 172, no. 5, 2018. doi: 10.1016/j.cell.2018.02.010
+\[2\] D. S. Kermany et al., "Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning," Cell, vol. 172, no. 5, 2018. https://doi.org/10.1016/j.cell.2018.02.010
 
-[3] P. T. Mooney, "Chest X-Ray Images (Pneumonia)," Kaggle. https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
+\[3\] P. T. Mooney, "Chest X-Ray Images (Pneumonia)," Kaggle. https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
