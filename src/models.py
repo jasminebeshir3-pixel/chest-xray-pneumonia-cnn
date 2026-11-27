@@ -1,6 +1,7 @@
 """Baselines and neural network architectures.
 
-Owner: Model Architect. The CNN models (A, B, C) are added in Phase 3.
+Owner: Model Architect. Contains the trivial and learned baselines;
+the CNN models (A, B, C) are added in Phase 3.
 """
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
