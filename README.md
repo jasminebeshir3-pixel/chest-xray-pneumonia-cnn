@@ -84,7 +84,7 @@ report/        report PDF and slides
 | Lara, 24100605 | Baseline and Analysis Engineer | trains Model A (custom CNN) and compares it with the baselines | starts in Phase 3 |
 | Jasmine Beshir, 24100515 | Model Architect | architectures, hand parameter counts, regularization, GradientTape step | `src/models.py` |
 | Sarah Ahmed, 24100558 | Experimentation Engineer | experiment log, tuning studies, learning curves | `src/train.py` |
-| Maryam Gomaa, [ID] | Evaluation and Deployment Engineer | metrics, error analysis, `predict.py`, demo app | `src/evaluate.py` |
+| Maryam Gomaa, [22100578] | Evaluation and Deployment Engineer | metrics, error analysis, `predict.py`, demo app | `src/evaluate.py` |
 
 ## License
 
