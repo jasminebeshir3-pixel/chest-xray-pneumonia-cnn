@@ -26,6 +26,55 @@ A radiology department needs a screening tool that flags chest X-rays likely to 
 
 CNN: a custom CNN built from scratch, then VGG16 transfer learning (frozen base) and fine-tuning (last block unfrozen).
 
+## Setup and Run
+
+```
+pip install -r requirements.txt
+python data/download_data.py      # then set CXR_DATA_DIR to the folder it prints
+python -m src.data                # rebuilds data/split.csv (already in the repo, same result with seed 42)
+python -m pytest tests            # leakage and preprocessing checks
+jupyter notebook notebooks/01_eda.ipynb
+python -m src.baselines           # trains both baselines and logs them in experiments/runs.csv
+```
+
+On Kaggle, add the dataset to the notebook; the code finds it under `/kaggle/input` by itself.
+
+## Data Split
+
+We pooled the official folders (the official validation folder has only 16 images), removed 32 exact duplicates and split 70 / 15 / 15 by patient, so no child has X-rays in two splits. `check_no_leakage` in `src/data.py` stops with an error if a patient or a file appears in two splits.
+
+| Split | NORMAL | PNEUMONIA | Total | Patients |
+|-------|-------:|----------:|------:|---------:|
+| train | 1,105 | 2,972 | 4,077 | 2,185 |
+| val | 237 | 636 | 873 | 468 |
+| test | 237 | 637 | 874 | 464 |
+
+## Results So Far (validation set)
+
+The test set is not used until the final model is chosen.
+
+| Model | Recall PNEUMONIA | Recall NORMAL | Macro-F1 | ROC-AUC |
+|-------|-----------------:|--------------:|---------:|--------:|
+| B0: majority class (always PNEUMONIA) | 1.000 | 0.000 | 0.421 | 0.500 |
+| B1: logistic regression, 64x64 pixels, class weights | 0.948 | 0.911 | 0.923 | 0.979 |
+| B1b: same without class weights | 0.964 | 0.848 | 0.913 | 0.979 |
+
+Every CNN must beat B1. Full log with hyperparameters, seed and training time: `experiments/runs.csv`.
+
+## Repository Structure
+
+```
+configs/       experiment config files (base.yaml has the shared settings)
+data/          download script, data README and our split (no images in git)
+notebooks/     01_eda.ipynb, later 02_results.ipynb
+src/           data.py, models.py, train.py, evaluate.py, baselines.py
+tests/         leakage and preprocessing checks
+experiments/   experiment log (runs.csv) and plots
+models/        final saved model
+app/           demo application
+report/        report PDF and slides
+```
+
 ## Team
 
 | Member | Role | Work package | Files so far |
