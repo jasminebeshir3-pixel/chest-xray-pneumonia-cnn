@@ -1,0 +1,17 @@
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# data and big files (the dataset is downloaded, not committed)
+chest_xray/
+*.zip
+models/checkpoints/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
